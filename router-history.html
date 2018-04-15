@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Router instance by history</title>
+    <style>
+        ul {
+            background-color: pink;
+        }
+        li {
+            padding: 20px;
+            border: 1px solid #fff;
+            color: #fff;
+            cursor: pointer;
+        }
+        a {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <ul>
+        <li data-hash="#/hash1">hash1</li>
+        <li data-hash="#/hash2">hash2</li>
+        <li data-hash="#/hash3">hash3</li>
+    </ul>
+    <p></p>
+    <script>
+        let ul = document.getElementsByTagName("ul")[0],
+            p = document.getElementsByTagName("p")[0];
+
+        window.history.replaceState({   //初始页面数据存储
+            text: ""
+        }, "初始页面", "");
+
+        ul.addEventListener("click", (event) => {
+            let target = event.target,
+                text = target.innerText;
+
+            if (target.tagName === "LI") {
+                window.history.pushState({  //将当前地址对于的数据存储起来。三个参数依次为：存储的数据、网页标题、URL地址
+                    text
+                }, text, target.getAttribute("data-hash"));
+
+                p.innerText = text;
+            }
+        });
+
+        window.addEventListener("popstate", (event) => {    //监听地址改变
+            p.innerText = event.state.text;
+        }, false);
+    </script>
+</body>
+</html>

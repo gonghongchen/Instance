@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Router instance by hash</title>
+    <style>
+        ul {
+            background-color: pink;
+        }
+        li {
+            padding: 20px;
+            border: 1px solid #fff;
+            color: #fff;
+        }
+        a {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <ul>
+        <li data-hash="#/hash1"><a href="#/hash1">hash1</a></li>
+        <li data-hash="#/hash2"><a href="#/hash2">hash2</a></li>
+        <li data-hash="#/hash3"><a href="#/hash3">hash3</a></li>
+    </ul>
+    <script>
+        let ul = document.getElementsByTagName("ul")[0],
+            changeBgColor = (color) => {
+                ul.style.backgroundColor = color;
+            };
+
+        class Router {
+            constructor() {
+                this.routers = {};  //以键值对的形式存放hash值及其处理方法
+
+                window.addEventListener("hashchange", () => {   //监听hashchange事件，并做相应处理
+                    this.routers[window.location.hash.slice(1)]();
+                }, false);
+            }
+            addRouter(hash, func) {
+                this.routers[hash] = func;
+            }
+            init() {    //初始化页面。主要是为了保证在某种hash值下刷新了页面后，页面以及可以显示该hash值对于的页面样式
+                if (window.location.hash) {
+                    this.routers[window.location.hash.slice(1)]();
+                }
+            }
+        }
+        let router = new Router;
+        //依次给各个链接添加路由功能
+        router.addRouter("/hash1", changeBgColor.bind(null, "green"));
+        router.addRouter("/hash2", changeBgColor.bind(null, "red"));
+        router.addRouter("/hash3", changeBgColor.bind(null, "blue"));
+        router.init();
+
+        ul.addEventListener("click", (event) => {   //通过js更改window.location.hash实现路由
+            let target = event.target;
+            if (target.tagName === "LI") {
+                window.location.hash = target.getAttribute("data-hash");
+            }
+        });
+    </script>
+</body>
+</html>
