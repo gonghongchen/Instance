@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>一些情况下的this指向</title>
+</head>
+<body>
+    <div>divdivdiv</div>
+    <script>
+        let obj = {
+            say() {
+                let div = document.getElementsByTagName("div")[0];
+
+                div.onclick = () => {
+                    console.log(this);  //obj
+                };
+                div.onclick = function() {
+                    console.log(this);  //div
+                };
+
+                div.addEventListener("click", () => {
+                    console.log(this);  //obj
+                }, false);
+                div.addEventListener("click", function() {
+                    console.log(this);  //div
+                }, false);
+
+                setTimeout(function() {
+                    console.log(this);  //window
+                });
+                setTimeout(() => {
+                    console.log(this);  //obj
+                });
+            }
+        };
+        obj.say();
+    </script>
+</body>
+</html>
