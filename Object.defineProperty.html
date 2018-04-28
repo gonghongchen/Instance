@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Object.defineProperty</title>
+    <style>
+        
+    </style>
+</head>
+<body>
+    <input type="text">
+    <p></p>
+    <script>
+        let inp = document.getElementsByTagName("input")[0],
+            p = document.getElementsByTagName("p")[0],
+            obj = {},
+            nowValue,
+            historyValue = [];
+
+        // Object.defineProperty(object, property, descriptor)。参考：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+        // descriptor 包括【数据描述符（D）】和【存取描述符（A）】，但只能存在其中一项！
+        Object.defineProperty(obj, "value", {
+            configurable: true, // D&A. default: false. 当为[false]: 1 不能通过[delete]关键字对此属性做删除操作（-> check 2）; 2 不能再次通过[Object.defineProperty]方法对此属性进行定义（-> check 4）
+            enumerable: true, // D&A. default: false. 当为[false]时，则不能通过[Object.keys()]方法及[for...in]循环找到此[key]值（-> check 3）
+
+            // value: "value", //D. default: undefined.
+            // writable: true, //D. default: false. 当为[false]时，则在外部对这个属性进行赋值时无效（-> check 1）
+
+            get() { //A. default: undefined. 
+                // console.log(this);  //obj
+                return nowValue;    //之所以不能用[return this.value]，是因为[this.value]也会调用[get]方法，这样会导致无限循环调用
+            },
+            set(value) { //A. default: undefined. [value]表示新值
+                nowValue = value;   //改变为新的值
+
+                //以下做了MVVM的数据双向绑定，并每次存储了下输入的值
+                historyValue.push(value.trim());
+                p.innerText = value;
+            }
+        });
+
+        //check 1
+        // console.log(obj.value);
+        // obj.value = "value1";
+        // console.log(obj.value);
+
+        //check 2
+        // delete obj.value;
+        // console.log(obj);
+
+        //check 3
+        // console.log(Object.keys(obj));
+        // for (let key in obj) {
+        //     if (obj.hasOwnProperty(key)) {
+        //         console.log(key);
+        //     }
+        // }
+
+        //check 4
+        // console.log(obj.a);
+        // Object.defineProperty(obj, "a", {
+        //     configurable: false,
+        //     value: 1
+        // });
+        // Object.defineProperty(obj, "a", {
+        //     writable: true
+        // });
+        // console.log(obj.a);
+
+        //check 5
+        // obj.a = 1;  //通过点的方式进行属性定义和赋值
+        // console.log(Object.getOwnPropertyDescriptor(obj, "a")); //{value: 1, writable: true, enumerable: true, configurable: true}
+        //由上面的打印结果可知，通过点的方式进行属性定义和赋值会使得该属性的描述符信息为：为可配置的，并且是可枚举的，可写的，且为数据描述符
+
+        inp.addEventListener("blur", function() {
+            // console.log(this);   //inp
+            obj.value = this.value;
+            console.log("historyValue: ", historyValue);
+        }, false);
+    </script>
+</body>
+</html>
